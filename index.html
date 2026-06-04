@@ -609,8 +609,8 @@ async function doLogout(){
 sb.auth.onAuthStateChange(async function(event,session){
   if(event==='SIGNED_IN'&&session){
     currentUser=session.user;
-    await loadProfile();
-    await initApp();
+    try { await loadProfile(); } catch(e) {}
+    initApp();
   }
 });
 
@@ -1117,7 +1117,13 @@ function toggleTheme(){
 })();
 
 // Check if already logged in
-sb.auth.getSession().then(function(res){if(res.data.session){currentUser=res.data.session.user;loadProfile().then(function(){initApp();});}});
+sb.auth.getSession().then(async function(res){
+  if(res.data.session){
+    currentUser=res.data.session.user;
+    try { await loadProfile(); } catch(e) {}
+    initApp();
+  }
+});
 </script>
 </body>
 </html>
