@@ -427,20 +427,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
         </div>
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 10px;text-align:center;position:relative">
           <div style="font-size:10px;color:var(--text3);margin-bottom:5px">Oportunidades</div>
-          <div style="font-family:var(--font-display);font-size:22px;font-weight:800">1.076</div>
-          <div style="font-size:10px;color:var(--green);margin-top:3px">CPO R$ 61,05</div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:800" id="gOpps">1.076</div>
+          <div style="font-size:10px;color:var(--green);margin-top:3px" id="gCPO">CPO R$ 61,05</div>
           <div style="position:absolute;right:-8px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:12px;z-index:1">›</div>
         </div>
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 10px;text-align:center;position:relative">
           <div style="font-size:10px;color:var(--text3);margin-bottom:5px">Em negociação</div>
-          <div style="font-family:var(--font-display);font-size:22px;font-weight:800">34</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:3px">3,2% das opps</div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:800" id="gNegociacao">34</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px" id="gPctNeg">3,2% das opps</div>
           <div style="position:absolute;right:-8px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:12px;z-index:1">›</div>
         </div>
         <div style="background:rgba(61,214,140,.06);border:1px solid rgba(61,214,140,.2);border-radius:var(--radius);padding:13px 10px;text-align:center">
           <div style="font-size:10px;color:var(--text3);margin-bottom:5px">Fechados</div>
-          <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--green)">15</div>
-          <div style="font-size:10px;color:var(--green);margin-top:3px">44% das propos.</div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--green)" id="gFechados">15</div>
+          <div style="font-size:10px;color:var(--green);margin-top:3px" id="gPctPropos">44% das propos.</div>
         </div>
       </div>
 
@@ -459,23 +459,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
         </div>
         <div style="background:var(--bg2);border:1px solid var(--border);border-top:2px solid var(--accent);border-radius:var(--radius);padding:14px 16px">
           <div style="font-size:10px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px">ROAS</div>
-          <div style="font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--accent)">4,5x</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:3px">R$ 350k fat. ÷ R$ 77k invest.</div>
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--accent)" id="gROAS">4,5x</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px" id="gROASsub">R$ 350k fat. ÷ R$ 77k invest.</div>
         </div>
         <div style="background:var(--bg2);border:1px solid var(--border);border-top:2px solid var(--orange);border-radius:var(--radius);padding:14px 16px">
           <div style="font-size:10px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px">Custo por fechamento</div>
-          <div style="font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--orange)">R$ 5.140,45</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:3px">invest. total ÷ 15 fechados</div>
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--orange)" id="gCPF">R$ 5.140,45</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px" id="gCPFsub">invest. total ÷ 15 fechados</div>
         </div>
         <div style="background:var(--bg2);border:1px solid var(--border);border-top:2px solid var(--text3);border-radius:var(--radius);padding:14px 16px">
           <div style="font-size:10px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px">Taxa OPP → Fechado</div>
-          <div style="font-family:var(--font-display);font-size:24px;font-weight:800">1,4%</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:3px">15 de 1.076 oportunidades</div>
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:800" id="gTaxaOpp">1,4%</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px" id="gTaxaOppSub">15 de 1.076 oportunidades</div>
         </div>
         <div style="background:var(--bg2);border:1px solid var(--border);border-top:2px solid var(--green);border-radius:var(--radius);padding:14px 16px">
           <div style="font-size:10px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px">Ticket médio</div>
-          <div style="font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--green)">R$ 23.333</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:3px">faturamento ÷ 15 fechados</div>
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--green)" id="gTM">R$ 23.333</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px" id="gTMsub">faturamento ÷ 15 fechados</div>
         </div>
       </div>
 
@@ -849,7 +849,7 @@ function prioTag(p){
 }
 function getFiltered(){return allLeads.filter(function(l){if(!searchQuery)return true;var q=searchQuery.toLowerCase();return((l.nome||'').toLowerCase().indexOf(q)>-1)||(l.whatsapp||'').indexOf(q)>-1||((l.email||'').toLowerCase().indexOf(q)>-1);});}
 function showToast(msg,ok){var t=document.getElementById('toast');t.textContent=msg;t.style.borderColor=(ok===false)?'var(--red)':'var(--green)';t.style.color=(ok===false)?'var(--red)':'var(--green)';t.style.display='block';clearTimeout(t._to);t._to=setTimeout(function(){t.style.display='none';},5000);}
-function showView(id,btn){document.querySelectorAll('#app .view').forEach(function(v){v.classList.remove('active');});document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});document.getElementById('view-'+id).classList.add('active');btn.classList.add('active');if(id==='dashboard')renderDashboard();else if(id==='kanban')renderKanban();else if(id==='lista')renderLista();else if(id==='gerencial'){};}
+function showView(id,btn){document.querySelectorAll('#app .view').forEach(function(v){v.classList.remove('active');});document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});document.getElementById('view-'+id).classList.add('active');btn.classList.add('active');if(id==='dashboard')renderDashboard();else if(id==='kanban')renderKanban();else if(id==='lista')renderLista();else if(id==='gerencial')renderGerencial();}
 function onSearch(v){searchQuery=v;var a=document.querySelector('#app .view.active');if(a.id==='view-kanban')renderKanban();else if(a.id==='view-lista'){listPage=1;renderLista();}}
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────
@@ -1259,6 +1259,43 @@ function toggleTheme(){
   var t=localStorage.getItem('bdv_theme');
   if(t==='light'){document.documentElement.setAttribute('data-theme','light');setTimeout(function(){var b=document.getElementById('themeBtn');if(b)b.textContent='🌙';},100);}
 })();
+
+// -- GERENCIAL DINAMICO --
+var G_INVEST=77106.72,G_INVEST_CAP=65694.59;
+function fR(v){return'R$ '+Math.round(v).toLocaleString('pt-BR');}
+function fR2(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function sEl(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+function renderGerencial(){
+  var fat=calcFat();
+  var nF=allLeads.filter(function(l){return l.etapa==='Fechado';}).length;
+  var CONF=calcConfirmados();
+  var opps=allLeads.filter(function(l){return l.etapa!=='Duplicado';}).length;
+  var neg=allLeads.filter(function(l){return['Proposta Enviada','Ligação Agendada','Potencial Fechamento'].indexOf(l.etapa)>-1;}).length;
+  var propos=allLeads.filter(function(l){return l.etapa==='Proposta Enviada';}).length;
+  var tm=CONF>0?fat/CONF:0;
+  var roas=G_INVEST>0?fat/G_INVEST:0;
+  var cpo=opps>0?G_INVEST_CAP/opps:0;
+  var cpf=nF>0?G_INVEST/nF:0;
+  var taxaOpp=opps>0?(nF/opps*100):0;
+  var pctNeg=opps>0?(neg/opps*100):0;
+  var pctPropos=propos>0?(nF/propos*100):0;
+  sEl('gFechados',nF);
+  sEl('gPctPropos',(pctPropos>0?pctPropos.toFixed(0):'--')+'% das propos.');
+  sEl('gOpps',opps.toLocaleString('pt-BR'));
+  sEl('gCPO','CPO '+fR2(cpo));
+  sEl('gNegociacao',neg);
+  sEl('gPctNeg',pctNeg.toFixed(1)+'% das opps');
+  sEl('gROAS',roas.toFixed(1)+'x');
+  var fatK=fat>=1000000?(fat/1000000).toFixed(1)+'M':(fat/1000).toFixed(0)+'k';
+  var invK=(G_INVEST/1000).toFixed(0)+'k';
+  sEl('gROASsub','R$ '+fatK+' fat. ÷ R$ '+invK+' invest.');
+  sEl('gCPF',fR2(cpf));
+  sEl('gCPFsub','invest. total ÷ '+nF+' fechados');
+  sEl('gTaxaOpp',taxaOpp.toFixed(1).replace('.',',')+'%');
+  sEl('gTaxaOppSub',nF+' de '+opps.toLocaleString('pt-BR')+' oportunidades');
+  sEl('gTM',fR(tm));
+  sEl('gTMsub','faturamento ÷ '+CONF+' confirmados');
+}
 
 // Check if already logged in
 (async function(){
