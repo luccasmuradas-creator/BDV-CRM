@@ -930,7 +930,8 @@ function renderKanban(){
     var cardsHtml=cards.length===0?'<div style="text-align:center;padding:14px;color:var(--text3);font-size:11px">—</div>':cards.map(function(l){
       var vTag='';
       if(pipeConf){var vv=(pipeConf.cls==='fechado'&&l.valor)?Number(l.valor):22000;var bg=pipeConf.cls==='fechado'?'rgba(75,232,122,.15)':'rgba(232,184,75,.1)';var fg=pipeConf.cls==='fechado'?'#4be87a':'#e8b84b';vTag='<span class="lead-tag" style="background:'+bg+';color:'+fg+';font-size:10px">R$ '+(vv/1000).toFixed(0)+'k</span>';}
-      return'<div class="lead-card" onclick="openLead(\''+l.id+'\')">'+'<div class="lead-name">'+(l.nome||'Sem nome')+'</div>'+'<div class="lead-meta">'+prioTag(l.prioridade)+(l.vendedor?'<span class="lead-tag tag-vendedor">'+l.vendedor+'</span>':'')+vTag+'</div></div>';
+      var dateStr=l.updated_at?'<span style="font-size:9px;color:var(--text3);margin-left:auto;white-space:nowrap">'+new Date(l.updated_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+'</span>':'';
+      return'<div class="lead-card" onclick="openLead(\''+l.id+'\')">'+'<div class="lead-name">'+(l.nome||'Sem nome')+'</div>'+'<div class="lead-meta" style="justify-content:space-between">'+prioTag(l.prioridade)+(l.vendedor?'<span class="lead-tag tag-vendedor">'+l.vendedor+'</span>':'')+vTag+dateStr+'</div></div>';
     }).join('');
     return'<div class="kanban-col" data-etapa="'+etapa+'"'
       +' ondragover="dragOver(event)"'
