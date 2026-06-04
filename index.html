@@ -709,6 +709,8 @@ var listEtapa='',listVendedor='',listPrioridade='';
 var listSort={field:'updated_at',dir:-1},listPage=1,PAGE_SIZE=50,searchQuery='';
 
 // ── AUTH ──────────────────────────────────────────────────────────────────
+var USERS={'luccas':'bdv2026','barbara':'bdv2026','higor':'bdv2026','leonardo':'bdv2026','victor':'bdv2026'};
+var NOMES={'luccas':'Luccas','barbara':'Barbara','higor':'Higor','leonardo':'Leonardo','victor':'Victor'};
 async function doLogin(){
   var email=document.getElementById('loginEmail').value.trim();
   var pass=document.getElementById('loginPassword').value;
@@ -728,25 +730,13 @@ async function doLogin(){
   await initApp();
 }
 async function loadProfile(){
-  try {
-    var res=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
-    if(res.data) currentProfile=res.data;
-  } catch(e) {}
-  var label=currentProfile?currentProfile.nome:(currentUser.email?currentUser.email.split('@')[0]:'user');
+  var saved=localStorage.getItem('bdv_user');
+  if(saved){try{var d=JSON.parse(saved);currentUser={email:d.user};currentProfile={nome:d.nome,vendedor:d.nome};}catch(e){}}
   var el=document.getElementById('userLabel');
-  if(el) el.textContent=label;
+  if(el&&currentProfile) el.textContent=currentProfile.nome;
 }
-async function doLogout(){
-  await sb.auth.signOut();
-  location.reload();
-}
-sb.auth.onAuthStateChange(async function(event,session){
-  if(event==='SIGNED_IN'&&session){
-    currentUser=session.user;
-    try { await loadProfile(); } catch(e) {}
-    initApp();
-  }
-});
+async function doLogout(){localStorage.removeItem('bdv_user');location.reload();}
+sb.auth.onAuthStateChange(function(){});
 
 // ── DATA ──────────────────────────────────────────────────────────────────
 async function initApp(){
