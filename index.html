@@ -167,8 +167,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 /* ── TAGS ───────────────────────────────────────────────────────────────── */
 .lead-tag{font-size:9px;padding:1px 6px;border-radius:3px;font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:.3px;line-height:1.5}
 .tag-alta{background:rgba(240,79,79,.1);color:#f06060}
-.tag-media{background:rgba(255,255,255,.07);color:var(--text3)}
-.tag-baixa{background:rgba(255,255,255,.04);color:var(--text3)}
+.tag-media{background:rgba(77,142,240,.12);color:#4d8ef0}
+.tag-baixa{background:rgba(139,149,171,.12);color:var(--text2)}
 .tag-vendedor{background:rgba(255,255,255,.06);color:var(--text2)}
 .etapa-badge{font-family:var(--font-display);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
 
@@ -842,11 +842,10 @@ function etapaBadge(e){
 }
 function prioTag(p){
   var pm=p?p.normalize('NFC'):'';
-  // Only show Alta visually — Média and Baixa are noise on cards
   if(pm==='Alta')return'<span class="lead-tag tag-alta">● Alta</span>';
-  if(pm==='Média'||pm.indexOf('dia')>0||pm==='Media')return'';
-  if(pm==='Baixa')return'';
-  return'';
+  if(pm==='Média'||pm.indexOf('dia')>0||pm==='Media')return'<span class="lead-tag tag-media">● Média</span>';
+  if(pm==='Baixa')return'<span class="lead-tag tag-baixa">● Baixa</span>';
+  return pm?'<span class="lead-tag tag-baixa">● '+pm+'</span>':'';
 }
 function getFiltered(){return allLeads.filter(function(l){if(!searchQuery)return true;var q=searchQuery.toLowerCase();return((l.nome||'').toLowerCase().indexOf(q)>-1)||(l.whatsapp||'').indexOf(q)>-1||((l.email||'').toLowerCase().indexOf(q)>-1);});}
 function showToast(msg,ok){var t=document.getElementById('toast');t.textContent=msg;t.style.borderColor=(ok===false)?'var(--red)':'var(--green)';t.style.color=(ok===false)?'var(--red)':'var(--green)';t.style.display='block';clearTimeout(t._to);t._to=setTimeout(function(){t.style.display='none';},5000);}
