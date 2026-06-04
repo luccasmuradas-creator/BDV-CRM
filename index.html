@@ -697,7 +697,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 var SUPA_URL = 'https://dxrkrmfhksrxldronlit.supabase.co';
 var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4cmtybWZoa3NyeGxkcm9ubGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NTI5NDQsImV4cCI6MjA5NjAyODk0NH0.RUS0F_2Ub_oB_-Xkmayj-juZRlJm7h1IuXk0H30Z3cE';
 var SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4cmtybWZoa3NyeGxkcm9ubGl0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDQ1Mjk0NCwiZXhwIjoyMDk2MDI4OTQ0fQ.Rsk2cH-BctLpvxZ9I8UrYa2bOqx-k08CyXgAa8Hbwn8';
-var sb = supabase.createClient(SUPA_URL, SERVICE_KEY);
+var sb; try { sb = supabase.createClient(SUPA_URL, SERVICE_KEY); } catch(e){ console.error("Supabase init:",e); }
 
 var ETAPAS=['Disparo','Disparo 2','Contatado','Follow-up 1','Follow-up 2','Recuperação','Redistribuição','Proposta Enviada','Ligação Agendada','Potencial Fechamento','Fechado','Perdido','Duplicado'];
 var EC={'Disparo':['#4b8be8','rgba(75,139,232,.15)'],'Disparo 2':['#7b6be8','rgba(123,107,232,.15)'],'Contatado':['#e8b84b','rgba(232,184,75,.15)'],'Follow-up 1':['#e8714b','rgba(232,113,75,.15)'],'Follow-up 2':['#e8914b','rgba(232,145,75,.15)'],'Recuperação':['#9b4be8','rgba(155,75,232,.15)'],'Redistribuição':['#4be8b5','rgba(75,232,181,.15)'],'Proposta Enviada':['#4bc8e8','rgba(75,200,232,.15)'],'Ligação Agendada':['#e84bb5','rgba(232,75,181,.15)'],'Potencial Fechamento':['#b5e84b','rgba(181,232,75,.15)'],'Fechado':['#4be87a','rgba(75,232,122,.15)'],'Perdido':['#e84b4b','rgba(232,75,75,.15)'],'Duplicado':['#4a5568','rgba(74,85,104,.3)']};
@@ -714,14 +714,19 @@ var NOMES={'luccas':'Luccas','barbara':'Barbara','higor':'Higor','leonardo':'Leo
 
 async function doLogin(){
   var user=document.getElementById('loginEmail').value.trim().toLowerCase();
-  var pass=document.getElementById('loginPassword').value;
+  var pass=document.getElementById('loginPassword').value.trim();
   var errEl=document.getElementById('loginError');
   errEl.textContent='';
+  errEl.style.color='var(--red)';
   document.getElementById('loginLoading').style.display='block';
   await new Promise(function(r){setTimeout(r,200);});
   document.getElementById('loginLoading').style.display='none';
-  if(!USERS[user]||USERS[user]!==pass){
-    errEl.textContent='Usuário ou senha incorretos';
+  if(!USERS[user]){
+    errEl.textContent='Usuário "'+user+'" não encontrado. Use: luccas, barbara, higor, leonardo ou victor';
+    return;
+  }
+  if(USERS[user]!==pass){
+    errEl.textContent='Senha incorreta para "'+user+'"';
     return;
   }
   currentUser={email:user};
@@ -762,6 +767,7 @@ async function initApp(){
   
 }
 async function loadLeads(){
+  if(!sb){showToast("Erro de conexão com banco de dados",false);return;}
   var res=await sb.from('leads').select('*').order('updated_at',{ascending:false});
   if(res.error){
     // Try with service key as fallback
