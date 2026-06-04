@@ -777,14 +777,7 @@ function fixEncoding(s){
          .replace(/Â©/g,'©').replace(/Â»/g,'»').replace(/Â«/g,'«')
          .replace(/Â·/g,'·').replace(/â€™/g,"'").replace(/â€œ/g,'"')
          .replace(/â€/g,'"').replace(/Â /g,' ')
-         // Additional patterns seen in data (Mv°rcia=Márcia, Jv/lio=Júlio etc)
-         .replace(/v°/g,'á').replace(/v©/g,'é').replace(/v³/g,'ó')
-         .replace(/v¡/g,'á').replace(/vª/g,'ê').replace(/v±/g,'ñ')
-         .replace(/v\//g,'ú').replace(/v√/g,'â').replace(/√©/g,'é')
-         .replace(/√£/g,'ã').replace(/√§/g,'ç').replace(/√¡/g,'á')
-         .replace(/√ª/g,'ê').replace(/√³/g,'ó').replace(/√µ/g,'õ')
-         .replace(/√­/g,'í').replace(/√¢/g,'â').replace(/√º/g,'ú')
-         .replace(/√\(/g,'Ó').replace(/√â€°/g,'É');
+;
   } catch(e) {}
   return s.normalize('NFC');
 }
