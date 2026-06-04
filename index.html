@@ -715,12 +715,17 @@ async function doLogin(){
   var loadEl=document.getElementById('loginLoading');
   errEl.textContent='';
   loadEl.style.display='block';
+  console.log('LOGIN: tentando auth...');
   var res=await sb.auth.signInWithPassword({email:email,password:pass});
   loadEl.style.display='none';
+  console.log('LOGIN: auth result', res.error ? 'ERRO: '+res.error.message : 'OK');
   if(res.error){errEl.textContent=res.error.message==='Invalid login credentials'?'Email ou senha incorretos':res.error.message;return;}
   currentUser=res.data.user;
-  try { await loadProfile(); } catch(e) {}
+  console.log('LOGIN: carregando profile...');
+  try { await loadProfile(); } catch(e) { console.log('LOGIN: profile erro', e); }
+  console.log('LOGIN: iniciando app...');
   await initApp();
+  console.log('LOGIN: app iniciado!');
 }
 async function loadProfile(){
   try {
@@ -745,11 +750,15 @@ sb.auth.onAuthStateChange(async function(event,session){
 
 // ── DATA ──────────────────────────────────────────────────────────────────
 async function initApp(){
+  console.log('INIT: escondendo login...');
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('app').style.display='block';
+  console.log('INIT: carregando leads...');
   await loadLeads();
+  console.log('INIT: leads carregados, total:', allLeads.length);
   setupRealtime();
   renderDashboard();
+  console.log('INIT: dashboard renderizado!');
 }
 async function loadLeads(){
   var res=await sb.from('leads').select('*').order('updated_at',{ascending:false});
