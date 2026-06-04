@@ -913,7 +913,7 @@ function renderKanban(){
   });
   document.getElementById('kanban-count').textContent=leads.length+' leads';
   var byE={};ETAPAS.forEach(function(e){byE[e]=[];});leads.forEach(function(l){if(byE[l.etapa])byE[l.etapa].push(l);else byE[l.etapa]=[l];});
-  var PIPE={'Fechado':{cls:'fechado',val:function(l){return l.valor?Number(l.valor):22000;}},'Potencial Fechamento':{cls:'hot',val:function(){return 22000;}},'Ligação Agendada':{cls:'hot',val:function(){return 22000;}},'Proposta Enviada':{cls:'medium',val:function(){return 22000;}}};
+  var PIPE={'Fechado':{cls:'fechado',val:function(l){var tk=parseInt(l.tickets,10)||1;return(l.valor?Number(l.valor):22000)*tk;}},'Potencial Fechamento':{cls:'hot',val:function(){return 22000;}},'Ligação Agendada':{cls:'hot',val:function(){return 22000;}},'Proposta Enviada':{cls:'medium',val:function(){return 22000;}}};
   var cols=ETAPAS.map(function(etapa){
     var cards=byE[etapa]||[],c=EC[etapa]?EC[etapa][0]:'#4a5568',pipeConf=PIPE[etapa],pipeHtml='';
     if(pipeConf&&cards.length>0){var tot=cards.reduce(function(s,l){return s+pipeConf.val(l);},0);pipeHtml='<div class="col-pipeline '+pipeConf.cls+'">R$ '+(tot>=1000000?(tot/1000000).toFixed(1)+'M':(tot/1000).toFixed(0)+'k')+' em pipeline</div>';}
