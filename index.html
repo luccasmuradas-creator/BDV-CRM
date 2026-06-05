@@ -635,13 +635,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
             <label style="display:block;font-size:10px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px">Etapa</label>
             <select id="importEtapa" class="etapa-select" style="margin-top:0">
               <option value="Disparo">Disparo</option>
-              <option value="Disparo 2">Disparo 2</option>
-              <option value="Contatado">Contatado</option>
+              <option value="Conversando">Conversando</option>
               <option value="Follow-up 1">Follow-up 1</option>
-              <option value="Proposta Enviada">Proposta Enviada</option>
+              <option value="Follow-up 2">Follow-up 2</option>
               <option value="Ligação Agendada">Ligação Agendada</option>
+              <option value="Proposta Enviada">Proposta Enviada</option>
               <option value="Potencial Fechamento">Potencial Fechamento</option>
               <option value="Fechado">Fechado</option>
+              <option value="Recuperação">Recuperação</option>
+              <option value="Redistribuição">Redistribuição</option>
+              <option value="Perdido">Perdido</option>
+              <option value="Duplicado">Duplicado</option>
             </select>
           </div>
           <div>
@@ -699,7 +703,7 @@ var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 var SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4cmtybWZoa3NyeGxkcm9ubGl0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDQ1Mjk0NCwiZXhwIjoyMDk2MDI4OTQ0fQ.Rsk2cH-BctLpvxZ9I8UrYa2bOqx-k08CyXgAa8Hbwn8';
 var sb; try { sb = supabase.createClient(SUPA_URL, SERVICE_KEY); } catch(e){ console.error("Supabase init:",e); }
 
-var ETAPAS=['Disparo','Disparo 2','Contatado','Follow-up 1','Follow-up 2','Recuperação','Redistribuição','Proposta Enviada','Ligação Agendada','Potencial Fechamento','Fechado','Perdido','Duplicado'];
+var ETAPAS=['Disparo','Conversando','Follow-up 1','Follow-up 2','Ligação Agendada','Proposta Enviada','Potencial Fechamento','Fechado','Recuperação','Redistribuição','Perdido','Duplicado'];
 var EC={'Disparo':['#4b8be8','rgba(75,139,232,.15)'],'Disparo 2':['#7b6be8','rgba(123,107,232,.15)'],'Contatado':['#e8b84b','rgba(232,184,75,.15)'],'Follow-up 1':['#e8714b','rgba(232,113,75,.15)'],'Follow-up 2':['#e8914b','rgba(232,145,75,.15)'],'Recuperação':['#9b4be8','rgba(155,75,232,.15)'],'Redistribuição':['#4be8b5','rgba(75,232,181,.15)'],'Proposta Enviada':['#4bc8e8','rgba(75,200,232,.15)'],'Ligação Agendada':['#e84bb5','rgba(232,75,181,.15)'],'Potencial Fechamento':['#b5e84b','rgba(181,232,75,.15)'],'Fechado':['#4be87a','rgba(75,232,122,.15)'],'Perdido':['#e84b4b','rgba(232,75,75,.15)'],'Duplicado':['#4a5568','rgba(74,85,104,.3)']};
 var META_CONF=35,META_FAT=1000000;
 
@@ -755,12 +759,25 @@ async function doLogout(){
 }
 
 // ── DATA ──────────────────────────────────────────────────────────────────
+async function migrateEtapas(){
+  var toMigrate=[{from:'Disparo 2',to:'Disparo'},{from:'Contatado',to:'Conversando'}];
+  for(var i=0;i<toMigrate.length;i++){
+    var m=toMigrate[i];
+    var has=allLeads.filter(function(l){return l.etapa===this.from;},m);
+    if(has.length>0){
+      await sb.from('leads').update({etapa:m.to}).eq('etapa',m.from);
+      allLeads.forEach(function(l){if(l.etapa===m.from)l.etapa=m.to;});
+      console.log('Migrated '+has.length+' leads: '+m.from+' -> '+m.to);
+    }
+  }
+}
 async function initApp(){
   
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('app').style.display='block';
   
   await loadLeads();
+  await migrateEtapas();
   
   setupRealtime();
   renderDashboard();
