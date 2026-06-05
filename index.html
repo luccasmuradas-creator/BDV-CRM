@@ -504,6 +504,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
         </table>
       </div>
 
+      <!-- DUPLICADOS -->
+      <div style="margin-top:8px">
+        <button onclick="toggleDupAnalysis()" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 16px;font-size:11px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:8px;width:100%">
+          <span id="dupBtnIcon">🔍</span> <span style="font-weight:600">Analisar Duplicados</span> <span id="dupBtnChevron" style="margin-left:auto;color:var(--text3)">&#9660;</span>
+        </button>
+        <div id="dupAnalysis" style="display:none;margin-top:8px">
+          <div id="dupLoading" style="padding:20px;text-align:center;color:var(--text3);font-size:12px">Analisando...</div>
+          <div id="dupResult" style="display:none">
+            <div style="display:flex;gap:8px;margin-bottom:10px">
+              <button id="dupTab1" onclick="showDupTab(1)" style="font-size:11px;padding:5px 12px;border-radius:4px;border:1px solid var(--border);background:var(--accent);color:#000;cursor:pointer;font-weight:700">Com par ativo <span id="dupCount1"></span></button>
+              <button id="dupTab2" onclick="showDupTab(2)" style="font-size:11px;padding:5px 12px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer">Sem par <span id="dupCount2"></span></button>
+            </div>
+            <div id="dupPane1"></div>
+            <div id="dupPane2" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1276,6 +1294,65 @@ function toggleTheme(){
   var t=localStorage.getItem('bdv_theme');
   if(t==='light'){document.documentElement.setAttribute('data-theme','light');setTimeout(function(){var b=document.getElementById('themeBtn');if(b)b.textContent='🌙';},100);}
 })();
+
+// -- DUPLICADOS ANALYSIS --
+var _dupOpen=false,_dupDone=false;
+function toggleDupAnalysis(){
+  _dupOpen=!_dupOpen;
+  document.getElementById('dupAnalysis').style.display=_dupOpen?'block':'none';
+  document.getElementById('dupBtnChevron').innerHTML=_dupOpen?'&#9650;':'&#9660;';
+  if(_dupOpen&&!_dupDone){runDupAnalysis();}
+}
+function normPhone(p){return(p||'').replace(/[^0-9]/g,'');}
+function normEmail(e){return(e||'').trim().toLowerCase();}
+function runDupAnalysis(){
+  var dups=allLeads.filter(function(l){return l.etapa==='Duplicado';});
+  var ativos=allLeads.filter(function(l){return l.etapa!=='Duplicado';});
+  var comPar=[],semPar=[];
+  dups.forEach(function(d){
+    var em=normEmail(d.email),ph=normPhone(d.whatsapp);
+    var match=null,by='';
+    if(em){match=ativos.find(function(l){return normEmail(l.email)===em&&em!=='';});if(match)by='email';}
+    if(!match&&ph&&ph.length>7){match=ativos.find(function(l){return normPhone(l.whatsapp)===ph;});if(match)by='whatsapp';}
+    if(!match){var nm=(d.nome||'').trim().toLowerCase();if(nm.length>3)match=ativos.find(function(l){return(l.nome||'').trim().toLowerCase()===nm;});if(match)by='nome';}
+    if(match)comPar.push({d:d,match:match,by:by});
+    else semPar.push(d);
+  });
+  document.getElementById('dupCount1').textContent='('+comPar.length+')';
+  document.getElementById('dupCount2').textContent='('+semPar.length+')';
+  var rs='border-bottom:1px solid var(--border)';
+  var th='font-size:10px;color:var(--text3);padding:8px 10px;text-align:left;font-weight:700;text-transform:uppercase;letter-spacing:.5px';
+  var td='font-size:11px;padding:7px 10px;color:var(--text2)';
+  function mkTable(rows,headers){
+    var t='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px"><table style="width:100%;border-collapse:collapse"><thead><tr style="'+rs+'">';
+    headers.forEach(function(h){t+='<th style="'+th+'">'+h+'</th>';});
+    t+='</tr></thead><tbody>'+rows+'</tbody></table></div>';
+    return t;
+  }
+  var rows1='';
+  comPar.forEach(function(r){
+    var dDate=(r.d.created_at||'').slice(0,10);
+    var contact=normEmail(r.d.email)||(normPhone(r.d.whatsapp)||'-');
+    rows1+='<tr style="'+rs+'"><td style="'+td+'">'+(r.d.nome||'-')+'</td><td style="'+td+'">'+contact+'</td><td style="'+td+'">'+dDate+'</td><td style="'+td+'">'+(r.match.nome||'-')+'</td><td style="'+td+'">'+r.match.etapa+'</td><td style="'+td+'">'+r.by+'</td></tr>';
+  });
+  document.getElementById('dupPane1').innerHTML=comPar.length?mkTable(rows1,['Duplicado','Contato','Entrada','Par ativo','Etapa par','Via']):'<div style="padding:16px;color:var(--text3);font-size:12px;text-align:center">Nenhum encontrado.</div>';
+  var rows2='';
+  semPar.forEach(function(d){
+    rows2+='<tr style="'+rs+'"><td style="'+td+'">'+(d.nome||'-')+'</td><td style="'+td+'">'+(d.email||'-')+'</td><td style="'+td+'">'+(d.whatsapp||'-')+'</td><td style="'+td+'">'+(d.created_at||'').slice(0,10)+'</td></tr>';
+  });
+  document.getElementById('dupPane2').innerHTML=semPar.length?mkTable(rows2,['Nome','Email','Whatsapp','Data entrada']):'<div style="padding:16px;color:var(--text3);font-size:12px;text-align:center">Todos os duplicados têm par ativo.</div>';
+  document.getElementById('dupLoading').style.display='none';
+  document.getElementById('dupResult').style.display='block';
+  _dupDone=true;
+}
+function showDupTab(n){
+  document.getElementById('dupPane1').style.display=n===1?'block':'none';
+  document.getElementById('dupPane2').style.display=n===2?'block':'none';
+  var on='background:var(--accent);color:#000;font-weight:700;border:1px solid var(--border);border-radius:4px;padding:5px 12px;font-size:11px;cursor:pointer';
+  var off='background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:4px;padding:5px 12px;font-size:11px;cursor:pointer';
+  document.getElementById('dupTab1').style.cssText=n===1?on:off;
+  document.getElementById('dupTab2').style.cssText=n===2?on:off;
+}
 
 // -- GERENCIAL DINAMICO --
 var G_INVEST=77106.72,G_INVEST_CAP=65694.59;
