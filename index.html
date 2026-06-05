@@ -1131,7 +1131,7 @@ function parseImportLines(){
   return text.split('\n').map(function(line){
     line=line.trim();
     if(!line)return null;
-    var parts=line.split(',').map(function(p){return p.trim();});
+    var parts=line.split(/[,\t]+/).map(function(p){return p.trim();}).filter(Boolean);
     var nome=parts[0]||'';
     var email='',whatsapp='';
     for(var i=1;i<parts.length;i++){
