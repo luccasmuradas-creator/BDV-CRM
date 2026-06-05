@@ -883,7 +883,7 @@ function calcConfirmados(){
 function renderDashboard(){
   var leads=allLeads,total=leads.filter(function(l){return l.etapa!=='Duplicado';}).length;
   var nFechados=leads.filter(function(l){return l.etapa==='Fechado';}).length;
-  var potencial=leads.filter(function(l){return['Proposta Enviada','Ligação Agendada','Potencial Fechamento'].indexOf(l.etapa)>-1;}).length;
+  var potencial=leads.filter(function(l){return['Proposta Enviada','Potencial Fechamento'].indexOf(l.etapa)>-1;}).length;
   var perdidos=leads.filter(function(l){return l.etapa==='Perdido';}).length;
   var fat=calcFat();
   var CONFIRMADOS=calcConfirmados();
@@ -1287,7 +1287,7 @@ function renderGerencial(){
   var nF=allLeads.filter(function(l){return l.etapa==='Fechado';}).length;
   var CONF=calcConfirmados();
   var opps=allLeads.filter(function(l){return l.etapa!=='Duplicado';}).length;
-  var neg=allLeads.filter(function(l){return['Proposta Enviada','Ligação Agendada','Potencial Fechamento'].indexOf(l.etapa)>-1;}).length;
+  var neg=allLeads.filter(function(l){return['Proposta Enviada','Potencial Fechamento'].indexOf(l.etapa)>-1;}).length;
   var propos=allLeads.filter(function(l){return l.etapa==='Proposta Enviada';}).length;
   var tm=CONF>0?fat/CONF:0;
   var roas=G_INVEST>0?fat/G_INVEST:0;
