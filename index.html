@@ -722,7 +722,7 @@ var SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 var sb; try { sb = supabase.createClient(SUPA_URL, SERVICE_KEY); } catch(e){ console.error("Supabase init:",e); }
 
 var ETAPAS=['Disparo','Conversando','Follow-up 1','Follow-up 2','Ligação Agendada','Proposta Enviada','Potencial Fechamento','Fechado','Recuperação','Redistribuição','Perdido','Duplicado'];
-var EC={'Disparo':['#4b8be8','rgba(75,139,232,.15)'],'Disparo 2':['#7b6be8','rgba(123,107,232,.15)'],'Contatado':['#e8b84b','rgba(232,184,75,.15)'],'Follow-up 1':['#e8714b','rgba(232,113,75,.15)'],'Follow-up 2':['#e8914b','rgba(232,145,75,.15)'],'Recuperação':['#9b4be8','rgba(155,75,232,.15)'],'Redistribuição':['#4be8b5','rgba(75,232,181,.15)'],'Proposta Enviada':['#4bc8e8','rgba(75,200,232,.15)'],'Ligação Agendada':['#e84bb5','rgba(232,75,181,.15)'],'Potencial Fechamento':['#b5e84b','rgba(181,232,75,.15)'],'Fechado':['#4be87a','rgba(75,232,122,.15)'],'Perdido':['#e84b4b','rgba(232,75,75,.15)'],'Duplicado':['#4a5568','rgba(74,85,104,.3)']};
+var EC={'Disparo':['#8892a4','rgba(136,146,164,.12)'],'Conversando':['#5b8dd9','rgba(91,141,217,.15)'],'Follow-up 1':['#4aa8d8','rgba(74,168,216,.15)'],'Follow-up 2':['#3dbfbf','rgba(61,191,191,.15)'],'Ligação Agendada':['#2ecfa0','rgba(46,207,160,.15)'],'Proposta Enviada':['#7ed644','rgba(126,214,68,.15)'],'Potencial Fechamento':['#a8e635','rgba(168,230,53,.15)'],'Fechado':['#4be87a','rgba(75,232,122,.18)'],'Recuperação':['#f5a623','rgba(245,166,35,.15)'],'Redistribuição':['#9b72e8','rgba(155,114,232,.15)'],'Perdido':['#e84b4b','rgba(232,75,75,.15)'],'Duplicado':['#4a5568','rgba(74,85,104,.2)']};
 var META_CONF=35,META_FAT=1000000;
 
 var allLeads=[],currentLead=null,currentUser=null,currentProfile=null;
