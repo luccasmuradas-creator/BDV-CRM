@@ -1128,9 +1128,29 @@ function closeImport(e){if(e.target===document.getElementById('importOverlay'))d
 function parseImportLines(){
   var text=document.getElementById('importText').value.trim();
   if(!text)return[];
-  return text.split('\n').map(function(line){
-    line=line.trim();
-    if(!line)return null;
+  // Detect labeled format: lines starting with Nome/E-mail/Telefone/Email/Tel
+  var labelRe=/^(nome|e-?mail|email|telefone|tel|phone|whatsapp|celular|contato)\s*[:\-]?\s*/i;
+  var lines=text.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+  // Group labeled blocks: blank line or new Nome: starts a new lead
+  var leads=[];
+  var cur={nome:'',email:'',whatsapp:''};
+  function pushCur(){if(cur.nome||cur.email||cur.whatsapp){leads.push({nome:cur.nome,email:cur.email,whatsapp:cur.whatsapp});cur={nome:'',email:'',whatsapp:'';};}}
+  var hasLabels=lines.some(function(l){return labelRe.test(l);});
+  if(hasLabels){
+    lines.forEach(function(line){
+      var m=line.match(/^(nome|e-?mail|email|telefone|tel|phone|whatsapp|celular|contato)\s*[:\-]?\s*(.*)/i);
+      if(!m){if(line==='' && (cur.nome||cur.email||cur.whatsapp))pushCur();return;}
+      var key=m[1].toLowerCase().replace('-',''),val=(m[2]||'').trim();
+      if(key==='nome'){if(cur.nome)pushCur();cur.nome=val;}
+      else if(key==='email'||key==='email'||key==='contato'&&val.indexOf('@')>-1){if(val.indexOf('@')>-1)cur.email=val;else cur.whatsapp=val.replace(/\D/g,'');}
+      else if(/email/.test(key)){cur.email=val;}
+      else {cur.whatsapp=val.replace(/\D/g,'');}
+    });
+    pushCur();
+    return leads.filter(function(l){return l.nome||l.email;});
+  }
+  // Standard format: comma or tab separated
+  return lines.map(function(line){
     var parts=line.split(/[,\t]+/).map(function(p){return p.trim();}).filter(Boolean);
     var nome=parts[0]||'';
     var email='',whatsapp='';
@@ -1138,7 +1158,7 @@ function parseImportLines(){
       var p=parts[i].trim();
       if(p.indexOf('@')>-1) email=p;
       else if(/^[0-9+\s\-()]{7,}$/.test(p)) whatsapp=p.replace(/\D/g,'');
-      else if(!email&&!whatsapp) whatsapp=p;
+      else if(!email&&!whatsapp) nome+=(' '+p);
     }
     if(!nome)return null;
     return{nome:nome,email:email,whatsapp:whatsapp};
