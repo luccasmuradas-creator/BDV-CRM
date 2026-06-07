@@ -795,7 +795,7 @@ async function doLogout(){
 
 // ── DATA ──────────────────────────────────────────────────────────────────
 async function migrateEtapas(){
-  var toMigrate=[{from:'Disparo 2',to:'Disparo'},{from:'Contatado',to:'Conversando'}];
+  var toMigrate=[{from:'Disparo 2',to:'Disparo'},{from:'Contatado',to:'Conversando'},{from:'Disparo',to:'Follow-up 2'}];
   for(var i=0;i<toMigrate.length;i++){
     var m=toMigrate[i];
     var has=allLeads.filter(function(l){return l.etapa===this.from;},m);
