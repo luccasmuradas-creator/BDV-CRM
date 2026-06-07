@@ -696,12 +696,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
         </div>
       </div>
       <div id="importPreview" style="margin-bottom:16px;display:none">
-        <div class="modal-section-title">Preview <span id="importCount" style="color:var(--accent)"></span></div>
-        <div id="importPreviewList" style="max-height:120px;overflow-y:auto;background:var(--bg3);border-radius:8px;padding:8px"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="modal-section-title" style="margin:0">Preview</div>
+          <div style="font-size:11px"><span id="importCountNovos" style="color:var(--green);font-weight:700"></span> <span id="importCountDups" style="color:var(--accent);font-weight:700"></span></div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+          <table style="width:100%;border-collapse:collapse">
+            <thead><tr style="border-bottom:1px solid var(--border)">
+              <th style="font-size:10px;color:var(--text3);padding:7px 10px;text-align:left;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Nome</th>
+              <th style="font-size:10px;color:var(--text3);padding:7px 10px;text-align:left;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Email</th>
+              <th style="font-size:10px;color:var(--text3);padding:7px 10px;text-align:left;font-weight:700;text-transform:uppercase;letter-spacing:.5px">WhatsApp</th>
+              <th style="font-size:10px;color:var(--text3);padding:7px 10px;text-align:left;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Status</th>
+            </tr></thead>
+          </table>
+          <div id="importPreviewList" style="max-height:220px;overflow-y:auto">
+            <table style="width:100%;border-collapse:collapse" id="importPreviewTable"></table>
+          </div>
+        </div>
       </div>
       <div style="display:flex;gap:10px;align-items:center">
-        <button class="btn-primary" style="flex:1;padding:11px" onclick="runImport()">&#x2B06; Importar Leads</button>
-        <button class="btn-ghost" onclick="previewImport()">Preview</button>
+        <button class="btn-primary" style="flex:1;padding:11px" id="btnRunImport" onclick="runImport()" disabled>&#x2B06; Importar</button>
+        <button class="btn-ghost" onclick="previewImport()">&#128269; Preview</button>
         <button class="btn-ghost" onclick="document.getElementById('importOverlay').classList.remove('open')">Cancelar</button>
       </div>
       <div id="importProgress" style="display:none;margin-top:12px">
@@ -1178,18 +1193,34 @@ function parseImportLines(){
 
 function previewImport(){
   var leads=parseImportLines();
-  var prev=document.getElementById('importPreview');
-  var list=document.getElementById('importPreviewList');
-  var count=document.getElementById('importCount');
-  if(!leads.length){showToast('Nenhum lead encontrado',false);return;}
-  count.textContent=leads.length+' lead(s)';
-  list.innerHTML=leads.slice(0,20).map(function(l){
-    return'<div style="font-size:11px;padding:4px 0;border-bottom:1px solid var(--border);color:var(--text2)">'+
-      '<span style="color:var(--text);font-weight:600">'+l.nome+'</span>'+
-      (l.email?' &nbsp;·&nbsp; '+l.email:'')+
-      (l.whatsapp?' &nbsp;·&nbsp; '+l.whatsapp:'')+'</div>';
-  }).join('')+(leads.length>20?'<div style="font-size:11px;color:var(--text3);padding:4px 0">...e mais '+(leads.length-20)+' leads</div>':'');
-  prev.style.display='block';
+  if(!leads.length){showToast('Nenhum lead encontrado. Verifique o formato.',false);return;}
+  // Check duplicates against existing leads
+  var rows=leads.map(function(l){
+    var isDup=false;
+    var em=(l.email||'').trim().toLowerCase();
+    var ph=(l.whatsapp||'').replace(/\D/g,'');
+    if(em||ph){
+      isDup=allLeads.some(function(x){
+        if(em&&(x.email||'').trim().toLowerCase()===em)return true;
+        if(ph&&ph.length>7&&(x.whatsapp||'').replace(/\D/g,'')===ph)return true;
+        return false;
+      });
+    }
+    return{l:l,dup:isDup};
+  });
+  var novos=rows.filter(function(r){return!r.dup;}).length;
+  var dups=rows.filter(function(r){return r.dup;}).length;
+  document.getElementById('importCountNovos').textContent='✔ '+novos+' novos';
+  document.getElementById('importCountDups').textContent=dups>0?'⚠ '+dups+' duplicados (serão ignorados)':'';
+  var td='font-size:11px;padding:6px 10px;color:var(--text2);border-bottom:1px solid var(--border)';
+  document.getElementById('importPreviewTable').innerHTML=rows.map(function(r){
+    var st=r.dup?'<span style="color:var(--accent);font-size:10px;font-weight:700">duplicado</span>':'<span style="color:var(--green);font-size:10px;font-weight:700">novo</span>';
+    var op=r.dup?'opacity:.5':'';
+    return'<tr style="'+op+'"><td style="'+td+';font-weight:600;color:var(--text)">'+(r.l.nome||'—')+'</td><td style="'+td+'">'+(r.l.email||'—')+'</td><td style="'+td+'">'+(r.l.whatsapp||'—')+'</td><td style="'+td+'">'+st+'</td></tr>';
+  }).join('');
+  document.getElementById('importPreview').style.display='block';
+  var btn=document.getElementById('btnRunImport');
+  if(btn){btn.disabled=novos===0;btn.textContent=novos>0?'⬆ Adicionar '+novos+' lead(s)':'⬆ Importar';}
 }
 
 async function runImport(){
