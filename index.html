@@ -688,7 +688,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
         </div>
         <div style="margin-top:10px">
           <label style="display:block;font-size:10px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px">Campanha</label>
-          <input type="text" id="importCampanha" class="note-input" style="width:100%" placeholder="ex: [BDV0526] [LEADS] [EVENTO]">
+          <select id="importCampanha" class="note-input" style="width:100%">
+            <option value="">Sem campanha</option>
+          </select>
         </div>
         <div style="margin-top:10px">
           <label style="display:block;font-size:10px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px">Origem</label>
@@ -1137,7 +1139,15 @@ function closeModal(e){if(e.target===document.getElementById('modalOverlay'))clo
 function closeModalBtn(){document.getElementById('modalOverlay').classList.remove('open');currentLead=null;var a=document.querySelector('#app .view.active');if(a&&a.id==='view-kanban')renderKanban();else if(a&&a.id==='view-lista')renderLista();}
 
 // ── IMPORT ───────────────────────────────────────────────────────────────
-function openImport(){document.getElementById('importOverlay').classList.add('open');document.getElementById('importPreview').style.display='none';document.getElementById('importProgress').style.display='none';}
+function openImport(){
+  document.getElementById('importOverlay').classList.add('open');
+  document.getElementById('importPreview').style.display='none';
+  document.getElementById('importProgress').style.display='none';
+  // Populate campaigns from existing leads
+  var sel=document.getElementById('importCampanha');
+  var camps=[...new Set(allLeads.map(function(l){return(l.campanha||'').trim();}).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">Sem campanha</option>'+camps.map(function(c){return'<option value="'+c+'">'+c+'</option>';}).join('');
+}
 function closeImport(e){if(e.target===document.getElementById('importOverlay'))document.getElementById('importOverlay').classList.remove('open');}
 
 function parseImportLines(){
