@@ -1146,7 +1146,7 @@ function parseImportLines(){
   lines=lines.filter(Boolean);
   var leads=[];
   var cur={nome:'',email:'',whatsapp:''};
-  function pushCur(){if(cur.nome||cur.email||cur.whatsapp){leads.push({nome:cur.nome,email:cur.email,whatsapp:cur.whatsapp});cur={nome:'',email:'',whatsapp:'';};}}
+  function pushCur(){if(cur.nome||cur.email||cur.whatsapp){leads.push({nome:cur.nome,email:cur.email,whatsapp:cur.whatsapp});cur={nome:'',email:'',whatsapp:''}}}
   var hasLabels=lines.some(function(l){return labelRe.test(l);});
   if(hasLabels){
     lines.forEach(function(line){
