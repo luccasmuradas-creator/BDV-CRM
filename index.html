@@ -652,7 +652,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
           <div>
             <label style="display:block;font-size:10px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px">Etapa</label>
             <select id="importEtapa" class="etapa-select" style="margin-top:0">
-              <option value="Disparo">Disparo</option>
+              <option value="Oportunidades">Oportunidades</option>
               <option value="Conversando">Conversando</option>
               <option value="Follow-up 1">Follow-up 1</option>
               <option value="Follow-up 2">Follow-up 2</option>
@@ -738,8 +738,8 @@ var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 var SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4cmtybWZoa3NyeGxkcm9ubGl0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDQ1Mjk0NCwiZXhwIjoyMDk2MDI4OTQ0fQ.Rsk2cH-BctLpvxZ9I8UrYa2bOqx-k08CyXgAa8Hbwn8';
 var sb; try { sb = supabase.createClient(SUPA_URL, SERVICE_KEY); } catch(e){ console.error("Supabase init:",e); }
 
-var ETAPAS=['Disparo','Conversando','Follow-up 1','Follow-up 2','Ligação Agendada','Proposta Enviada','Potencial Fechamento','Fechado','Recuperação','Redistribuição','Perdido','Duplicado'];
-var EC={'Disparo':['#8892a4','rgba(136,146,164,.12)'],'Conversando':['#5b8dd9','rgba(91,141,217,.15)'],'Follow-up 1':['#4aa8d8','rgba(74,168,216,.15)'],'Follow-up 2':['#3dbfbf','rgba(61,191,191,.15)'],'Ligação Agendada':['#2ecfa0','rgba(46,207,160,.15)'],'Proposta Enviada':['#7ed644','rgba(126,214,68,.15)'],'Potencial Fechamento':['#a8e635','rgba(168,230,53,.15)'],'Fechado':['#4be87a','rgba(75,232,122,.18)'],'Recuperação':['#f5a623','rgba(245,166,35,.15)'],'Redistribuição':['#9b72e8','rgba(155,114,232,.15)'],'Perdido':['#e84b4b','rgba(232,75,75,.15)'],'Duplicado':['#4a5568','rgba(74,85,104,.2)']};
+var ETAPAS=['Oportunidades','Conversando','Follow-up 1','Follow-up 2','Ligação Agendada','Proposta Enviada','Potencial Fechamento','Fechado','Recuperação','Redistribuição','Perdido','Duplicado'];
+var EC={'Oportunidades':['#8892a4','rgba(136,146,164,.12)'],'Conversando':['#5b8dd9','rgba(91,141,217,.15)'],'Follow-up 1':['#4aa8d8','rgba(74,168,216,.15)'],'Follow-up 2':['#3dbfbf','rgba(61,191,191,.15)'],'Ligação Agendada':['#2ecfa0','rgba(46,207,160,.15)'],'Proposta Enviada':['#7ed644','rgba(126,214,68,.15)'],'Potencial Fechamento':['#a8e635','rgba(168,230,53,.15)'],'Fechado':['#4be87a','rgba(75,232,122,.18)'],'Recuperação':['#f5a623','rgba(245,166,35,.15)'],'Redistribuição':['#9b72e8','rgba(155,114,232,.15)'],'Perdido':['#e84b4b','rgba(232,75,75,.15)'],'Duplicado':['#4a5568','rgba(74,85,104,.2)']};
 var META_CONF=35,META_FAT=1000000;
 
 var allLeads=[],currentLead=null,currentUser=null,currentProfile=null;
@@ -795,7 +795,7 @@ async function doLogout(){
 
 // ── DATA ──────────────────────────────────────────────────────────────────
 async function migrateEtapas(){
-  var toMigrate=[{from:'Disparo 2',to:'Disparo'},{from:'Contatado',to:'Conversando'},{from:'Disparo',to:'Follow-up 2'}];
+  var toMigrate=[{from:'Disparo 2',to:'Oportunidades'},{from:'Disparo',to:'Oportunidades'},{from:'Contatado',to:'Conversando'}];
   for(var i=0;i<toMigrate.length;i++){
     var m=toMigrate[i];
     var has=allLeads.filter(function(l){return l.etapa===this.from;},m);
