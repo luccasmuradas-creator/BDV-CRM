@@ -761,7 +761,7 @@ async function doLogin(){
   await new Promise(function(r){setTimeout(r,200);});
   document.getElementById('loginLoading').style.display='none';
   if(!USERS[user]){
-    errEl.textContent='Usuário "'+user+'" não encontrado. Use: luccas, barbara, higor, leonardo ou victor';
+    errEl.textContent='Usuário "'+user+'" não encontrado. Use: luccas, barbara, higor, leonardo, victor ou matheus';
     return;
   }
   if(USERS[user]!==pass){
