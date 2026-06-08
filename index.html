@@ -268,7 +268,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
     <div class="topbar-right">
       <div class="search-box">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" id="globalSearch" placeholder="Buscar lead..." oninput="onSearch(this.value)">
+        <input type="text" id="globalSearch" placeholder="Buscar por nome, email ou telefone..." oninput="onSearch(this.value)">
       </div>
       <button class="btn-ghost btn-import" onclick="openImport()">&#x2B06; Importar</button>
       <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" title="Alternar tema">🌙</button>
@@ -761,7 +761,7 @@ async function doLogin(){
   await new Promise(function(r){setTimeout(r,200);});
   document.getElementById('loginLoading').style.display='none';
   if(!USERS[user]){
-    errEl.textContent='Usuário "'+user+'" não encontrado. Use: luccas, barbara, higor, leonardo, victor ou matheus';
+    errEl.textContent='Usuário "'+user+'" não encontrado. Use: luccas, barbara, higor, leonardo ou victor';
     return;
   }
   if(USERS[user]!==pass){
@@ -795,24 +795,15 @@ async function doLogout(){
 
 // ── DATA ──────────────────────────────────────────────────────────────────
 async function migrateEtapas(){
-  var VALID_ETAPAS=new Set(ETAPAS);
-  // Only migrate known old stage names
   var toMigrate=[{from:'Disparo 2',to:'Oportunidades'},{from:'Disparo',to:'Oportunidades'},{from:'Contatado',to:'Conversando'}];
   for(var i=0;i<toMigrate.length;i++){
     var m=toMigrate[i];
     var has=allLeads.filter(function(l){return l.etapa===this.from;},m);
     if(has.length>0){
-      await sb.from('leads').update({etapa:m.to,updated_at:new Date().toISOString()}).eq('etapa',m.from);
+      await sb.from('leads').update({etapa:m.to}).eq('etapa',m.from);
       allLeads.forEach(function(l){if(l.etapa===m.from)l.etapa=m.to;});
       console.log('Migrated '+has.length+' leads: '+m.from+' -> '+m.to);
     }
-  }
-  // Detect leads with corrupted/unknown etapa values and log them
-  var corrupted=allLeads.filter(function(l){return l.etapa && !VALID_ETAPAS.has(l.etapa);});
-  if(corrupted.length>0){
-    console.warn('LEADS COM ETAPA INVÁLIDA/CORROMPIDA ('+corrupted.length+'):');
-    corrupted.forEach(function(l){console.warn('  id='+l.id+' nome='+l.nome+' etapa=['+l.etapa+']');});
-    showToast('⚠️ '+corrupted.length+' lead(s) com etapa inválida detectado(s). Ver console.',false);
   }
 }
 async function initApp(){
@@ -829,27 +820,16 @@ async function initApp(){
 }
 async function loadLeads(){
   if(!sb){showToast("Erro de conexão com banco de dados",false);return;}
-  // Fetch all rows — Supabase default cap is 1000; use range to get everything
-  var allRows=[];
-  var pageSize=1000;
-  var from=0;
-  while(true){
-    var res=await sb.from('leads').select('*').order('updated_at',{ascending:false}).range(from,from+pageSize-1);
-    if(res.error){
-      if(allRows.length===0){
-        showToast('Erro ao carregar leads: '+res.error.message,false);
-        return;
-      }
-      break;
-    }
-    var rows=res.data||[];
-    allRows=allRows.concat(rows);
-    if(rows.length<pageSize) break;
-    from+=pageSize;
+  var res=await sb.from('leads').select('*').order('updated_at',{ascending:false});
+  if(res.error){
+    // Try with service key as fallback
+    var sb2=supabase.createClient(SUPA_URL, SERVICE_KEY);
+    var res2=await sb2.from('leads').select('*').order('updated_at',{ascending:false});
+    if(res2.error){showToast('Erro ao carregar leads: '+res2.error.message,false);return;}
+    allLeads=(res2.data||[]).map(normalizeLead);
+    return;
   }
-  allLeads=allRows.map(normalizeLead);
-  console.log('loadLeads: '+allLeads.length+' leads carregados');
-}
+  allLeads=(res.data||[]).map(normalizeLead);}
 
 function normalizeLead(l){
   if(!l)return l;
@@ -893,16 +873,13 @@ function setupRealtime(){
 }
 async function saveLead(lead){
   document.getElementById('savingIndicator').style.display='block';
-  var now=new Date().toISOString();
   var res=await sb.from('leads').upsert({
     id:lead.id, nome:lead.nome, email:lead.email, whatsapp:lead.whatsapp,
     etapa:lead.etapa, vendedor:lead.vendedor, prioridade:lead.prioridade,
     campanha:lead.campanha, origem:lead.origem, valor:lead.valor,
     tickets:lead.tickets||1,
-    classificacao:lead.classificacao, timeline:lead.timeline,
-    updated_at:now
-  },{onConflict:'id'});
-  if(!res.error) lead.updated_at=now;
+    classificacao:lead.classificacao, timeline:lead.timeline
+  }, {headers:{'apikey': SUPA_KEY, 'Authorization': 'Bearer '+SUPA_KEY}});
   document.getElementById('savingIndicator').style.display='none';
   if(res.error) showToast('Erro ao salvar: '+res.error.message,false);
   return !res.error;
@@ -928,25 +905,19 @@ function showView(id,btn){document.querySelectorAll('#app .view').forEach(functi
 function onSearch(v){searchQuery=v;var a=document.querySelector('#app .view.active');if(a.id==='view-kanban')renderKanban();else if(a.id==='view-lista'){listPage=1;renderLista();}}
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────
-function isFechado(l){
-  // Guard against any residual encoding variants of "Fechado"
-  var e=l.etapa||'';
-  try{ e=e.normalize('NFC'); }catch(ex){}
-  return e==='Fechado';
-}
 function calcFat(){
   var t=0;
-  allLeads.filter(isFechado)
+  allLeads.filter(function(l){return l.etapa==='Fechado';})
     .forEach(function(l){var tk=parseInt(l.tickets,10);t+=(l.valor?Number(l.valor):22000)*(tk>0?tk:1);});
   return t;
 }
 function calcConfirmados(){
-  return allLeads.filter(isFechado)
+  return allLeads.filter(function(l){return l.etapa==='Fechado';})
     .reduce(function(s,l){var t=parseInt(l.tickets,10);return s+(t>0?t:1);},0);
 }
 function renderDashboard(){
   var leads=allLeads,total=leads.filter(function(l){return l.etapa!=='Duplicado';}).length;
-  var nFechados=leads.filter(isFechado).length;
+  var nFechados=leads.filter(function(l){return l.etapa==='Fechado';}).length;
   var potencial=leads.filter(function(l){return['Proposta Enviada','Potencial Fechamento'].indexOf(l.etapa)>-1;}).length;
   var perdidos=leads.filter(function(l){return l.etapa==='Perdido';}).length;
   var fat=calcFat();
@@ -1049,7 +1020,7 @@ function renderModal(){
   var wa=document.getElementById('mWhatsapp');if(l.whatsapp){wa.href='https://wa.me/'+l.whatsapp;wa.style.display='inline-flex';}else wa.style.display='none';
   // Show/hide venda section based on etapa
   var secaoFechado=document.getElementById('secaoFechado');
-  if(secaoFechado) secaoFechado.style.display=isFechado(l)?'block':'none';
+  if(secaoFechado) secaoFechado.style.display=(l.etapa==='Fechado')?'block':'none';
   var vi=document.getElementById('mValorInput');
   var ti=document.getElementById('mTicketsInput');
   if(vi) vi.value=l.valor||'';
@@ -1462,7 +1433,7 @@ function fR2(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,ma
 function sEl(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
 function renderGerencial(){
   var fat=calcFat();
-  var nF=allLeads.filter(isFechado).length;
+  var nF=allLeads.filter(function(l){return l.etapa==='Fechado';}).length;
   var CONF=calcConfirmados();
   var opps=allLeads.filter(function(l){return l.etapa!=='Duplicado';}).length;
   var neg=allLeads.filter(function(l){return['Proposta Enviada','Potencial Fechamento'].indexOf(l.etapa)>-1;}).length;
