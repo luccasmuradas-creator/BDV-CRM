@@ -504,6 +504,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
         </table>
       </div>
 
+      <!-- SAIDAS ETAPAS QUENTES -->
+      <div style="margin-top:24px;margin-bottom:8px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);font-weight:700;margin-bottom:10px">Saídas de Etapas Quentes</div>
+        <button onclick="toggleSaidasAnalysis()" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 16px;font-size:11px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:8px;width:100%">
+          <span>📉</span> <span style="font-weight:600">Leads que saíram de Proposta Enviada / Potencial Fechamento (7 dias)</span> <span id="saidasChevron" style="margin-left:auto;color:var(--text3)">&#9660;</span>
+        </button>
+        <div id="saidasAnalysis" style="display:none;margin-top:8px">
+          <div id="saidasLoading" style="padding:20px;text-align:center;color:var(--text3);font-size:12px">Analisando timeline...</div>
+          <div id="saidasResult" style="display:none"></div>
+        </div>
+      </div>
+
       <!-- DUPLICADOS -->
       <div style="margin-top:8px">
         <button onclick="toggleDupAnalysis()" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 16px;font-size:11px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:8px;width:100%">
@@ -1366,6 +1378,74 @@ function toggleTheme(){
   var t=localStorage.getItem('bdv_theme');
   if(t==='light'){document.documentElement.setAttribute('data-theme','light');setTimeout(function(){var b=document.getElementById('themeBtn');if(b)b.textContent='🌙';},100);}
 })();
+
+// -- SAIDAS ETAPAS QUENTES --
+var _saidasOpen=false,_saidasDone=false;
+function toggleSaidasAnalysis(){
+  _saidasOpen=!_saidasOpen;
+  document.getElementById('saidasAnalysis').style.display=_saidasOpen?'block':'none';
+  document.getElementById('saidasChevron').innerHTML=_saidasOpen?'&#9650;':'&#9660;';
+  if(_saidasOpen&&!_saidasDone)runSaidasAnalysis();
+}
+function runSaidasAnalysis(){
+  var etapasQuentes=['Proposta Enviada','Potencial Fechamento'];
+  var cutoff=new Date(Date.now()-7*24*60*60*1000);
+  var resultados=[];
+  allLeads.forEach(function(l){
+    if(!l.timeline||!Array.isArray(l.timeline))return;
+    var tl=l.timeline.slice().sort(function(a,b){return new Date(a.at)-new Date(b.at);});
+    for(var i=0;i<tl.length;i++){
+      var ev=tl[i];
+      if(ev.type!=='etapa'&&ev.type!=='stage')continue;
+      var evDate=new Date(ev.at);
+      if(evDate<cutoff)continue;
+      // This event moved FROM a hot stage
+      var fromEtapa=ev.from||ev.de||'';
+      var toEtapa=ev.to||ev.para||ev.etapa||'';
+      if(etapasQuentes.indexOf(fromEtapa)>-1&&etapasQuentes.indexOf(toEtapa)===-1){
+        resultados.push({lead:l,de:fromEtapa,para:toEtapa,quando:evDate});
+      }
+    }
+  });
+  // Sort by most recent first
+  resultados.sort(function(a,b){return b.quando-a.quando;});
+  document.getElementById('saidasLoading').style.display='none';
+  var res=document.getElementById('saidasResult');
+  res.style.display='block';
+  if(resultados.length===0){
+    res.innerHTML='<div style="padding:16px;color:var(--text3);font-size:12px;text-align:center;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)">Nenhuma saída de etapas quentes nos últimos 7 dias registrada na timeline.</div>';
+    _saidasDone=true;return;
+  }
+  var rs='border-bottom:1px solid var(--border)';
+  var th='font-size:10px;color:var(--text3);padding:8px 10px;text-align:left;font-weight:700;text-transform:uppercase;letter-spacing:.5px';
+  var td='font-size:11px;padding:7px 10px;color:var(--text2)';
+  var rows=resultados.map(function(r){
+    var d=r.quando;
+    var dtStr=d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    var paraColor=r.para==='Perdido'?'color:#e84b4b':r.para==='Recuperação'?'color:var(--orange)':'color:var(--text2)';
+    return '<tr style="'+rs+'">'
+      +'<td style="'+td+';font-weight:600;color:var(--text)" onclick="openLead(\''+r.lead.id+'\')" class="clickable">'+(r.lead.nome||r.lead.email||'-')+'</td>'
+      +'<td style="'+td+'">'+(r.lead.whatsapp||r.lead.email||'-')+'</td>'
+      +'<td style="'+td+';color:var(--accent)">'+r.de+'</td>'
+      +'<td style="'+td+';'+paraColor+'">'+r.para+'</td>'
+      +'<td style="'+td+';color:var(--text3)">'+dtStr+'</td>'
+      +'<td style="'+td+'">'+(r.lead.vendedor||'-')+'</td>'
+      +'</tr>';
+  }).join('');
+  res.innerHTML='<div style="margin-bottom:8px;font-size:11px;color:var(--text3)">'
+    +resultados.length+' movimento(s) encontrado(s) nos últimos 7 dias</div>'
+    +'<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">'
+    +'<table style="width:100%;border-collapse:collapse">'
+    +'<thead><tr style="'+rs+'">'
+    +'<th style="'+th+'">Nome</th>'
+    +'<th style="'+th+'">Contato</th>'
+    +'<th style="'+th+'">Saíu de</th>'
+    +'<th style="'+th+'">Foi para</th>'
+    +'<th style="'+th+'">Quando</th>'
+    +'<th style="'+th+'">Consultor</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table></div>';
+  _saidasDone=true;
+}
 
 // -- DUPLICADOS ANALYSIS --
 var _dupOpen=false,_dupDone=false;
