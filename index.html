@@ -832,11 +832,11 @@ async function initApp(){
 }
 async function loadLeads(){
   if(!sb){showToast("Erro de conexão com banco de dados",false);return;}
-  var res=await sb.from('leads').select('*').order('updated_at',{ascending:false});
+  var res=await sb.from('leads').select('*').order('updated_at',{ascending:false}).limit(5000);
   if(res.error){
     // Try with service key as fallback
     var sb2=supabase.createClient(SUPA_URL, SERVICE_KEY);
-    var res2=await sb2.from('leads').select('*').order('updated_at',{ascending:false});
+    var res2=await sb2.from('leads').select('*').order('updated_at',{ascending:false}).limit(5000);
     if(res2.error){showToast('Erro ao carregar leads: '+res2.error.message,false);return;}
     allLeads=(res2.data||[]).map(normalizeLead);
     return;
