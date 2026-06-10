@@ -392,7 +392,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px">
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px">
           <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Total investido</div>
-          <div style="font-family:var(--font-display);font-size:26px;font-weight:800">R$ 77.106,72</div>
+          <div style="font-family:var(--font-display);font-size:26px;font-weight:800">R$ 91.189,33</div>
           <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
             <span style="font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(61,214,140,.08);color:var(--green);border:1px solid rgba(61,214,140,.2)">Captação R$ 65.694,59</span>
             <span style="font-size:10px;padding:2px 8px;border-radius:4px;background:var(--bg3);color:var(--text3);border:1px solid var(--border)">Engajamento R$ 11.412,13</span>
@@ -466,6 +466,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
           <div style="font-size:10px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px">Custo por fechamento</div>
           <div style="font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--orange)" id="gCPF">R$ 5.140,45</div>
           <div style="font-size:10px;color:var(--text3);margin-top:3px" id="gCPFsub">invest. total ÷ 15 fechados</div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-top:2px solid var(--purple);border-radius:var(--radius);padding:14px 16px">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px">CPA — Custo por Aquisição</div>
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--purple)" id="gCPA">R$ 4.799,44</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px" id="gCPAsub">R$ 91.189 total ÷ 19 participantes</div>
         </div>
         <div style="background:var(--bg2);border:1px solid var(--border);border-top:2px solid var(--text3);border-radius:var(--radius);padding:14px 16px">
           <div style="font-size:10px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px">Taxa OPP → Fechado</div>
@@ -1514,7 +1519,7 @@ function showDupTab(n){
 }
 
 // -- GERENCIAL DINAMICO --
-var G_INVEST=77106.72,G_INVEST_CAP=65694.59;
+var G_INVEST=77106.72,G_INVEST_CAP=65694.59,G_INVEST_TOTAL=91189.33,G_PARTICIPANTES=19;
 function fR(v){return'R$ '+Math.round(v).toLocaleString('pt-BR');}
 function fR2(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function sEl(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
@@ -1544,6 +1549,9 @@ function renderGerencial(){
   sEl('gROASsub','R$ '+fatK+' fat. ÷ R$ '+invK+' invest.');
   sEl('gCPF',fR2(cpf));
   sEl('gCPFsub','invest. total ÷ '+nF+' fechados');
+  var cpa=G_INVEST_TOTAL/G_PARTICIPANTES;
+  sEl('gCPA',fR2(cpa));
+  sEl('gCPAsub','R$ 91.189 total ÷ '+G_PARTICIPANTES+' participantes');
   sEl('gTaxaOpp',taxaOpp.toFixed(1).replace('.',',')+'%');
   sEl('gTaxaOppSub',nF+' de '+opps.toLocaleString('pt-BR')+' oportunidades');
   sEl('gTM',fR(tm));
